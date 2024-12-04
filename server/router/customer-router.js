@@ -20,6 +20,8 @@ router.route("/edit/:id").patch(customercontrollers.updatecust);
 router.route("/custlist").get(customercontrollers.getcust);
 router.route("/delete/:id").delete(customercontrollers.deletecust);
 router.route("/status/:id").patch(customercontrollers.statuscust);
+
+
 const storage = multer.diskStorage({
     destination: function(req,file, cb){
       if(!fs.existsSync("public")){

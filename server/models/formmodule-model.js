@@ -36,7 +36,20 @@ const sidebarSchema = new Schema({
 
 const Sidebar = new model('sidebar', sidebarSchema);
 
-module.exports = {Page, Field, Sidebar};
+const templateSchema = new Schema({
+  template_name: String,
+  createdBy: String,
+  createdDate: Date
+});
+const Template = new model('template',templateSchema);
+
+const templatefieldsSchema = new Schema({
+  template_id: String,
+  pageid:String,
+});
+const Templatefields = new model('templatefields',templatefieldsSchema);
+
+module.exports = {Page, Field, Sidebar,Template, Templatefields};
 
 
 

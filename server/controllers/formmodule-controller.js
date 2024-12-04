@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
-const {Page, Field, Sidebar} = require("../models/formmodule-model");
+const {Page, Field, Sidebar, Template, Templatefields} = require("../models/formmodule-model");
 const Customer = require("../models/customer-model");
-
 
     async function createTable(req, res) {
         try {
@@ -330,8 +329,79 @@ const Customer = require("../models/customer-model");
 
     };
       
+    const addtemplate = async(req,res)=>{
+        try {
+            const template_name = req.body.templ;
+            const bussacc = req.body.bussacc;
+            const fields = req.body.pageid;
+            console.log(fields);
+            const dataExist = await Template.findOne({ template_name });
+        
+            if (dataExist) {
+                return res.status(400).json({ msg: "Template Name already exists" });
+            }
+
+            const cmCreated = await Template.create({
+                template_name,
+                createdDate: new Date(),
+            });
+
+            const template_id = cmCreated._id.toString();
+            
+           
+                for (const field of fields) {
+                    const fieldData = {
+                        template_id:template_id,
+                        pageid: field.id,
+                    };
+                    const savedField = await Templatefields.create(fieldData);
+                }
+            
+                const updatecust = await Customer.updateOne({ _id:bussacc },{
+                $set:{
+                    admintemplate_id: template_id,      
+                }
+            },{
+                new:true,
+            });
+            res.status(200).json({msg:'Template added Successfully'});  
+        }catch(error){
+            console.error("Error in addtemplate:", error.message); // Log the error message
+            res.status(500).json({ error: "Internal Server Error", details: error.message }); // Send the error message in the response
+        }
+    }
+
+    const gettemplates  = async (req,res)=>{
+        try {
+            const template = await Template.find();
+            res.status(200).json({
+                template:template,
+        
+            });
+        }catch(error){
+            console.error("Error in getall:", error.message); // Log the error message
+            res.status(500).json({ error: "Internal Server Error", details: error.message }); // Send the error message in the response
+        }
+
+    };
+
+    const getpage = async (req, res) => {
+        try {
+            const id = req.params.id.trim();;
+            const page = await Page.find({
+                page_name: { $regex: id, $options: 'i' }
+              });
+              
+            res.status(200).json({
+                page:page,
+            });
+        }catch(error){
+            console.error("Error in getall:", error.message); // Log the error message
+            res.status(500).json({ error: "Internal Server Error", details: error.message }); // Send the error message in the response
+        }
+    }
     
-module.exports = {create_pages,update_pages, getdata, getall, deletedata , deletefield, addsidebaricon , getSidebarOptions};
+module.exports = {getpage, create_pages,update_pages, getdata, getall, deletedata , deletefield, addsidebaricon , getSidebarOptions,addtemplate,gettemplates};
 
 
 //CODE for import data on new database from existing database 

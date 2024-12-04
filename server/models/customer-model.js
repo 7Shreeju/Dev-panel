@@ -45,8 +45,14 @@ const customerSchema = new mongoose.Schema({
     },
     brand:{
         type:String,
+    },
+    admintemplate_id:{
+        type:String,
+    },
+    fronttemplate_id:{
+        type:String,
     }
-    
+
 });
 
 //imp 

@@ -198,5 +198,7 @@ const getdatabyid = async(req, res) => {
     }
 };
 
+
+
 module.exports = { addcust , updatecust , getcust, getcustbyid, deletecust , statuscust,updateprofile,getdatabyid};
 

@@ -39,6 +39,9 @@ router.route("/deletefield/:id").delete(Formmodulecontrollers.deletefield);
 // router.route("/addsidebaricon").post(Formmodulecontrollers.addsidebaricon);
 router.post("/addsidebaricon",upload.single('icon'),Formmodulecontrollers.addsidebaricon);
 router.route("/getSidebarOptions").get(Formmodulecontrollers.getSidebarOptions);
+router.route("/addtemplate").post(Formmodulecontrollers.addtemplate);
+router.route("/gettemplates").get(Formmodulecontrollers.gettemplates);
+router.route("/getpage/:id").get(Formmodulecontrollers.getpage);
 
 
 
