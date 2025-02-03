@@ -30,9 +30,7 @@ const customerSchema = new mongoose.Schema({
     pic_url:{
         type:String,
     },
-//    secret_key:{
-//         type:String,
-//     },
+    
     status:{
         type:String,
     },

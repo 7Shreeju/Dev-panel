@@ -46,10 +46,20 @@ const Template = new model('template',templateSchema);
 const templatefieldsSchema = new Schema({
   template_id: String,
   pageid:String,
+  pagename:String,
 });
 const Templatefields = new model('templatefields',templatefieldsSchema);
 
-module.exports = {Page, Field, Sidebar,Template, Templatefields};
+
+const usertemplatefields = new Schema({
+  user_id: String,
+  pageid:String,
+  pagename:String,
+});
+const Usertemplatefields = new model('usertemplatefields',usertemplatefields);
+
+
+module.exports = {Page, Field, Sidebar,Template, Templatefields, Usertemplatefields};
 
 
 

@@ -82,35 +82,37 @@ const login = async (req, res) => {
             });
 
             //mailerfunction
-            const transporter = nodemailer.createTransport({
-                host: "smtp.gmail.com",
-                port: 587,
-                secure: false, // Use `true` for port 465, `false` for all other ports
-                auth: {
-                    user: "digihost2021@gmail.com",
-                    pass: "lvrncususaqdsopy",
-                },
-            });
+            // const transporter = nodemailer.createTransport({
+            //     host: "smtp.gmail.com",
+            //     port: 587,
+            //     secure: false, // Use `true` for port 465, `false` for all other ports
+            //     auth: {
+            //         user: "digihost2021@gmail.com",
+            //         pass: "lvrncususaqdsopy",
+            //     },
+            // });
 
 
-            async function main() {
-                // send mail with defined transport object
-                const info = await transporter.sendMail({
-                    from: '"DigiHost 👻" <digihost2021@gmail.com>', // sender address
-                    // to: email, // list of receivers
-                    to: `${email}`, // list of receivers
-                    subject: "Hello Welcome Back ✔", // Subject line
-                    text: "Welcome to Your Customer Panel below is your OTP to login:", // plain text body
-                    html: `${rand}`, // html body
-                });
+            // async function main() {
+            //     // send mail with defined transport object
+            //     const info = await transporter.sendMail({
+            //         from: '"DigiHost 👻" <digihost2021@gmail.com>', // sender address
+            //         // to: email, // list of receivers
+            //         to: `${email}`, // list of receivers
+            //         subject: "Hello Welcome Back ✔", // Subject line
+            //         text: "Welcome to Your Customer Panel below is your OTP to login:", // plain text body
+            //         html: `${rand}`, // html body
+            //     });
 
-            }
+            // }
 
-            main().catch(console.error);
+            // main().catch(console.error);
 
             res.status(200).json({
                 msg: "login successfull",
-                email: userExist.email,
+                token: await userExist.generateToken2(),
+                email: email,
+                id: userExist._id.toString(),
 
             });
         } else {

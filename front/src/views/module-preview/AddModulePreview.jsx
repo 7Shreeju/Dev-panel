@@ -47,10 +47,10 @@ const AddModulePreview = () => {
 
 const formatString = (str) => {
   if (!str) return "";
-  // Replace underscores with spaces and capitalize the first letter
+
   return str
-    .replace(/_/g, " ") // Replace all underscores with spaces
-    .replace(/\b\w/g, (char) => char.toUpperCase()); // Capitalize first letter of each word
+    .replace(/_/g, " ") 
+    .replace(/\b\w/g, (char) => char.toUpperCase()); 
 };
 
   const options = [

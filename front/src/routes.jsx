@@ -106,6 +106,26 @@ const routes = [
         path: "/module-preview/list-module-preview",
         element: lazy(() => import("./views/module-preview/ListModulePreview")),
       },
+      {
+        exact: "true",
+        path: "/product/product-features",
+        element: lazy(() => import("./views/product/product-features")),
+      },
+      {
+        exact: "true",
+        path: "/custom/list",
+        element: lazy(() => import("./views/custom/list")),
+      },
+      {
+        exact: "true",
+        path: "/custom/theme",
+        element: lazy(() => import("./views/custom/theme")),
+      },
+      {
+        exact: "true",
+        path: "/custom/editor",
+        element: lazy(() => import("./views/custom/editor")),
+      },
     ]
   }
 ];

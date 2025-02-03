@@ -1,5 +1,7 @@
 
 const Customer = require("../models/customer-model");
+const {Page, Field, Sidebar, Template, Templatefields, Usertemplatefields} = require("../models/formmodule-model");
+
 const bcrypt = require("bcryptjs");
 
 function createCleanUrl(title) {
@@ -16,6 +18,7 @@ const addcust = async (req,res)=>{
     try {
         console.log(req.body);
         const { username, email, phone,compname,address,description,brand } = req.body;
+        const password = `${username}@2021`;
         const status= '1';    
         const usercount = await Customer.countDocuments({ isAdmin: { $ne: 'true' } });
        
@@ -34,7 +37,7 @@ const addcust = async (req,res)=>{
             return res.status(400).json({msg:"Email ID already exist"});
 
         }
-        const cmCreated =  await Customer.create( { username, email, phone,compname,address,description, brand } );
+        const cmCreated =  await Customer.create( { username, email,password, phone,compname,address,description, brand } );
         res.status(201).json({
             msg:cmCreated,
             busid:cmCreated._id.toString(),

@@ -1,5 +1,4 @@
-import React from 'react';
-import { useState,useEffect } from "react";
+import React, {  useState, useEffect,} from "react";
 import { Card, Row, Col, Form, Button } from 'react-bootstrap';
 import { soupherb, gaikwad, ongc, Lotus } from '../../images';
 import { Link } from 'react-router-dom';
@@ -7,16 +6,35 @@ import { AiOutlinePlus } from 'react-icons/ai';
 import { FaRegEye } from 'react-icons/fa';
 import { useAuth } from "../../store/auth";
 import {  useNavigate } from 'react-router-dom';
+
 const CreateNewProject = () => {
 
   const {isLoggedIn}= useAuth();
   const navigate = useNavigate();
+  const [adminlist, setAdminlist] = useState([]);
+
+  const fetchData = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/api/customer/custlist');
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status}`);
+      }
+      const result = await response.json();
+      setAdminlist(result.msg);
+
+    } catch (error) {
+      
+      console.error('Error fetching data:', error);
+      console.log('Failed to load data. Please try again later.');
+    } 
+  };
 
   useEffect(() => {
     if( !isLoggedIn ){
       navigate('/auth/signin');
     }
-  }, [isLoggedIn, navigate]); // Depend on `isLoggedIn` and `navigate` to avoid repeated execution
+    fetchData();
+  }, [isLoggedIn, navigate]); 
 
 
   return (
@@ -46,34 +64,36 @@ const CreateNewProject = () => {
           </div>
         </Col>
       </Row>
-      <Row>
-        <Col lg={4}>
+      <Row>      
+      {adminlist.map((val) => (
+        <Col lg={4} key={val._id} >
           <Card className="project-card">
             <div className="card-image-wrapper">
               <Card.Img variant="top" src={Lotus} />
               <div className="overlay">
                 <div className="button">
                   <a
-                    href="https://www.lotusdevelopers.com/"
+                    href="http://localhost:3001/auth/signin"
                     target="_blank"
                     className="create-button btn btn-primary waves-effect waves-light"
                   >
-                    Preview
+                    Preview 
                   </a>
                 </div>
               </div>
             </div>
             <Card.Body>
               <Card.Title>
-                Lotus Developers{' '}
-                <a href="https://www.lotusdevelopers.com/" target="_blank" style={{ float: 'right' }} className="view-color">
+              {val.compname} {' '}
+                <a href="http://localhost:3001/auth/signin" target="_blank" style={{ float: 'right' }} className="view-color">
                   <FaRegEye />
                 </a>
               </Card.Title>
             </Card.Body>
           </Card>
         </Col>
-        <Col lg={4}>
+      ))}
+        {/* <Col lg={4}>
           <Card className="project-card">
             <div className="card-image-wrapper">
               <Card.Img variant="top" src={gaikwad} />
@@ -120,9 +140,9 @@ const CreateNewProject = () => {
               </Card.Title>
             </Card.Body>
           </Card>
-        </Col>
+        </Col> */}
       </Row>
-      <Row>
+      {/* <Row>
         <Col lg={4}>
           <Card className="project-card">
             <div className="card-image-wrapper">
@@ -197,7 +217,7 @@ const CreateNewProject = () => {
             </Card.Body>
           </Card>
         </Col>
-      </Row>
+      </Row> */}
     </div>
   );
 };

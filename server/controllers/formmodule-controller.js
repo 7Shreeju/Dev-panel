@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const {Page, Field, Sidebar, Template, Templatefields} = require("../models/formmodule-model");
+const {Page, Field, Sidebar, Template, Templatefields, Usertemplatefields} = require("../models/formmodule-model");
 const Customer = require("../models/customer-model");
 
     async function createTable(req, res) {
@@ -50,6 +50,7 @@ const Customer = require("../models/customer-model");
                 fields_validation: field.validation,
                 // fields_key: field.key,
                 fields_type: field.inputtype,
+                drodown: field.drodown,
                 // createdBy: req.user._id,
                 createdDate: new Date()
               };
@@ -149,6 +150,8 @@ const Customer = require("../models/customer-model");
                         existingField.fields_name = field.name;
                         existingField.fields_validation = field.validation;
                         existingField.fields_type = field.inputtype;
+                        existingField.dropdown = field.dropdown;
+
                         existingField.updatedDate = new Date();
                         await existingField.save();
                     } else {
@@ -158,6 +161,7 @@ const Customer = require("../models/customer-model");
                             fields_name: field.name,
                             fields_validation: field.validation,
                             fields_type: field.inputtype,
+                            dropdown: field.dropdown,
                             createdDate: new Date(),
                         };
                         await Field.create(fieldData);
@@ -230,6 +234,32 @@ const Customer = require("../models/customer-model");
             res.status(500).json({ error: "Internal Server Error", details: error.message }); // Send the error message in the response
         }
     };
+
+    const getfieldbyurl = async(req,res) =>{
+        try {
+            const id = req.params.id; 
+            const page = await Page.findOne({ page_url: id }); 
+        
+            if (!page) {
+                return res.status(404).json({ error: "Page not found" }); 
+            }
+        
+            const fields = await Field.find({ 
+                page_id: page._id, 
+                fields_validation: { $ne: "Auto Save" } 
+            });
+        
+            res.status(200).json({
+                page,
+                fields,
+              
+            });
+        } catch (error) {
+            console.error("Error in getdata:", error.message);
+            res.status(500).json({ error: "Internal Server Error", details: error.message }); 
+        }
+
+    }
 
     const getall  = async (req,res)=>{
         try {
@@ -328,7 +358,22 @@ const Customer = require("../models/customer-model");
         }
 
     };
-      
+
+
+
+    const getPageOptions  = async (req,res)=>{
+        try {
+            const page = await Page.find();
+            res.status(200).json({
+                msg:page,
+        
+            });
+        }catch(error){
+            console.error("Error in getall:", error.message); // Log the error message
+            res.status(500).json({ error: "Internal Server Error", details: error.message }); // Send the error message in the response
+        }
+
+    };
     const addtemplate = async(req,res)=>{
         try {
             const template_name = req.body.templ;
@@ -353,6 +398,7 @@ const Customer = require("../models/customer-model");
                     const fieldData = {
                         template_id:template_id,
                         pageid: field.id,
+                        pagename: field.name,
                     };
                     const savedField = await Templatefields.create(fieldData);
                 }
@@ -364,7 +410,7 @@ const Customer = require("../models/customer-model");
             },{
                 new:true,
             });
-            res.status(200).json({msg:'Template added Successfully'});  
+            res.status(200).json({msg:'Template added Successfully',template_id:template_id});  
         }catch(error){
             console.error("Error in addtemplate:", error.message); // Log the error message
             res.status(500).json({ error: "Internal Server Error", details: error.message }); // Send the error message in the response
@@ -387,7 +433,7 @@ const Customer = require("../models/customer-model");
 
     const getpage = async (req, res) => {
         try {
-            const id = req.params.id.trim();;
+            const id = req.params.id.trim();
             const page = await Page.find({
                 page_name: { $regex: id, $options: 'i' }
               });
@@ -400,8 +446,226 @@ const Customer = require("../models/customer-model");
             res.status(500).json({ error: "Internal Server Error", details: error.message }); // Send the error message in the response
         }
     }
+
+    const gettemfields = async (req, res) => {
+        try {
+            const id = req.params.id.trim();
+            const page = await Templatefields.find({
+                template_id: id
+              });
+              
+            res.status(200).json({
+                tempfields:page,
+            });
+        }catch(error){
+            console.error("Error in getall:", error.message); // Log the error message
+            res.status(500).json({ error: "Internal Server Error", details: error.message }); // Send the error message in the response
+        }
+    }
+
+    const getsearchtemplates = async (req, res) => {
+        try {
+            const id = req.params.id.trim();
+            const template = await Template.find({
+                template_name: { $regex: id, $options: 'i' }
+              });
+              
+            res.status(200).json({
+                template:template,
+            });
+        }catch(error){
+            console.error("Error in getall:", error.message); // Log the error message
+            res.status(500).json({ error: "Internal Server Error", details: error.message }); // Send the error message in the response
+        }
+    }
+
+    const getadditionalmodules = async (req, res) => {
+        const preids = req.body.preids; // Extract `preids` from the request body
+        try {
+            // Validate that preids is an array
+            if (!Array.isArray(preids)) {
+                return res.status(400).json({ error: "Invalid input: preids must be an array." });
+            }
     
-module.exports = {getpage, create_pages,update_pages, getdata, getall, deletedata , deletefield, addsidebaricon , getSidebarOptions,addtemplate,gettemplates};
+            // Extract `id` values from preids and convert them to ObjectId using `new`
+            const excludedIds = preids.map(item => new mongoose.Types.ObjectId(item.id));
+    
+            // Query Templatefields excluding the IDs in `excludedIds`
+            const page = await Page.find({
+                _id: { $nin: excludedIds }, // Exclude these IDs
+            });
+    
+            res.status(200).json({
+                tempfields: page,
+            });
+        } catch (error) {
+            console.error("Error in getadditionalmodules:", error.message);
+            res.status(500).json({ error: "Internal Server Error", details: error.message });
+        }
+    };
+    
+     const updatetmeplateid = async(req,res)=>{
+        const template_id = req.body.id;
+        const bussacc = req.body.bussacc;
+        
+        try {
+            const updatecust = await Customer.updateOne({ _id:bussacc },{
+                $set:{
+                    admintemplate_id: template_id,      
+                }
+            },{
+                new:true,
+            });
+
+
+            const fields = await Templatefields.find({
+                template_id: template_id
+              });
+
+              const deletedata = await Usertemplatefields.deleteMany(({user_id:bussacc}));
+
+              for (const field of fields) {
+                const fieldData = {
+                    user_id:bussacc,
+                    pageid: field.pageid,
+                    pagename: field.pagename,
+                };
+                const savedField = await Usertemplatefields.create(fieldData);
+            }
+
+
+            res.status(200).json({
+                msg:'Admin Template Selected.',
+            });
+        } catch (error) {
+            console.error("Error in getadditionalmodules:", error.message);
+            res.status(500).json({ error: "Internal Server Error", details: error.message });
+        }
+        
+     }
+    
+     const getpage1 = async (req, res) => {
+        try {
+            const id = req.params.id.trim();
+            const preids = req.body.preids;
+            if (!Array.isArray(preids)) {
+                return res.status(400).json({ error: "Invalid input: preids must be an array." });
+            }
+
+            const excludedIds = preids.map(item => new mongoose.Types.ObjectId(item.id));
+    
+            // Query Templatefields excluding the IDs in `excludedIds`
+            const page = await Page.find({
+                _id: { $nin: excludedIds }, 
+                page_name: { $regex: id, $options: 'i' }
+            });
+              
+            res.status(200).json({
+                page:page,
+            });
+        }catch(error){
+            console.error("Error in getpage1:", error.message); // Log the error message
+            res.status(500).json({ error: "Internal Server Error", details: error.message }); // Send the error message in the response
+        }
+    }
+
+    const inmodagclt =async (req,res)=>{
+        try {
+            const pageid = req.body.pageid;
+            const pagename = req.body.pagename;
+            const bussacc = req.body.bussacc;
+           
+
+            // const dataExist = await Usertemplatefields.findOne({ pageid:pageid, user_id:bussacc });
+        
+            // if (dataExist) {
+            //     return res.status(400).json({ msg: "Already exists" });
+            // }
+
+            const cmCreated = await Usertemplatefields.create({
+                user_id:bussacc,
+                pageid: pageid,
+                pagename: pagename,
+              });
+
+            res.status(200).json({
+                msg:'Module added successfully',
+            });
+
+
+        } catch (error) {
+            console.error("Error in inmodagclt:", error.message); // Log the error message
+            res.status(500).json({ error: "Internal Server Error", details: error.message }); // Send the error message in the response
+        }
+    }
+
+    const getclientmodules = async(req,res)=>{
+        try {
+            const id = req.params.id.trim();
+            const preids = req.body.preids;
+            if (!Array.isArray(preids)) {
+                return res.status(400).json({ error: "Invalid input: preids must be an array." });
+            }
+
+            const excludedIds = preids.map(item => new mongoose.Types.ObjectId(item.id));
+    
+            // Query Templatefields excluding the IDs in `excludedIds`
+            const page = await Usertemplatefields.find({
+                pageid: { $nin: excludedIds }, 
+                user_id:id ,
+            });
+              
+            res.status(200).json({
+                page:page,
+            });
+        }catch(error){
+            console.error("Error in getpage1:", error.message); // Log the error message
+            res.status(500).json({ error: "Internal Server Error", details: error.message }); // Send the error message in the response
+        }
+    }
+
+    const getroutesdata = async (req, res) => {
+        try {
+          const custid = req.params.id;
+      
+          // Check if Customer exists
+          const customer = await Customer.findOne({ _id: custid });
+          if (!customer) {
+            return res.status(404).json({ msg: "Customer not found" });
+          }
+      
+          // Fetch template fields
+          const template_id = customer.admintemplate_id;
+          const tempfields = await Templatefields.find({ template_id });
+          
+          // Fetch template user data
+          const tempfieldsuser = await Template.find({ _id: template_id, user_id: custid });
+      
+          if (tempfields.length > 0 || tempfieldsuser.length > 0) {
+            const pageIds = tempfields.map(field => field.pageid);
+            const pages = await Page.find({ _id: { $in: pageIds } }); 
+
+                pagesData = pages.map(page => ({
+                    pagename: page.page_name,
+                    pageid: page._id,
+                    pageurl: page.page_url, 
+                }));
+            }
+
+            if (pagesData.length > 0) {
+            return res.status(200).json({ msg: pagesData });
+            } else {
+            return res.status(404).json({ msg: "No Template Data Found" });
+            }
+            
+      
+        } catch (error) {
+          console.error("Error in getroutesdata:", error.message);
+          res.status(500).json({ error: "Internal Server Error", details: error.message });
+        }
+      };
+      
+module.exports = {getfieldbyurl, getclientmodules,getroutesdata, inmodagclt, getpage1, updatetmeplateid, getadditionalmodules,getsearchtemplates, gettemfields, getpage, create_pages,update_pages, getdata, getall, deletedata , deletefield, addsidebaricon , getSidebarOptions,addtemplate,gettemplates,getPageOptions};
 
 
 //CODE for import data on new database from existing database 

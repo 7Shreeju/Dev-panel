@@ -49,29 +49,74 @@ import {
               
             ],
           },
+       
           {
-            id: "module-preview",
-            title: "Module Preview",
+            id: "product",
+            title: "Product",
             type: "collapse",
             icon: "feather icon-file-text",
             src: dashboardImg4,
   
             children: [
               {
-                id: "module-preview",
-                title: "Add Module Preview",
+                id: "product-category",
+                title: "Product Features List",
                 type: "item",
                 // icon: "feather icon-file-text",
                 // src: dashboardImg4,
-                url: "/module-preview/add-module-preview",
+                url: "/product/product-features",
               },
+            ],
+          },
+          {
+            id: "custom",
+            title: "Custom",
+            type: "collapse",
+            icon: "feather icon-file-text",
+            src: dashboardImg4,
+  
+            children: [
               {
-                id: "module-preview",
-                title: "Module List Preview",
+                id: "custom",
+                title: "Custom List",
                 type: "item",
                 // icon: "feather icon-file-text",
                 // src: dashboardImg4,
-                url: "/module-preview/list-module-preview",
+                url: "/custom/list",
+              },
+            ],
+          },
+          {
+            id: "Theme",
+            title: "Theme",
+            type: "collapse",
+            icon: "feather icon-file-text",
+            src: dashboardImg4,
+            children: [
+              {
+                id: "Theme",
+                title: "Theme List",
+                type: "item",
+                // icon: "feather icon-file-text",
+                // src: dashboardImg4,
+                url: "/custom/theme",
+              },
+            ],
+          },
+          {
+            id: "Editor",
+            title: "Editor",
+            type: "collapse",
+            icon: "feather icon-file-text",
+            src: dashboardImg4,
+            children: [
+              {
+                id: "Editor",
+                title: "Editor List",
+                type: "item",
+                // icon: "feather icon-file-text",
+                // src: dashboardImg4,
+                url: "/custom/editor",
               },
             ],
           },

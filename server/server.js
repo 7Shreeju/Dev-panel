@@ -15,6 +15,7 @@ const customerloginRoute = require("./router/customerauth-router");
 const formmoduleRoute = require("./router/formmodule-router");
 const crudRoute = require("./router/crud-router");
 const domainRoute = require("./router/domain-router.js");
+const customRoute = require("./router/custom-router.js");
 
 
 const connectDB = require("./utils/db");
@@ -24,7 +25,7 @@ const errorMiddleware1 = require("./middlewares/error-middleware");
 
 // handling cors
 const corsoptions = {
-    origin:'http://localhost:3000', 
+    origin:['http://localhost:3000', 'http://localhost:3001', 'http://localhost:5173'], 
     methods: "GET, POST, PUT, DELETE, PATCH, HEAD",
     credentials:true  
 }; 
@@ -32,6 +33,10 @@ app.use(cors(corsoptions));
 
 app.use(express.json());
 app.use('/sidebar', express.static(path.join(__dirname, 'public/sidebar')));
+app.use('/custom', express.static(path.join(__dirname, 'public/custom')));
+app.use('/adminmodules', express.static(path.join(__dirname, 'public/adminmodules')));
+app.use('/public/texteditor', express.static(path.join(__dirname, 'public/texteditor')));
+
 
 app.use("/api/auth", authRoute);
 // app.use("/api/data", authRoute);
@@ -44,6 +49,7 @@ app.use("/api/customerauth", customerloginRoute);
 app.use("/api/form",formmoduleRoute);
 app.use("/api/crud", crudRoute);
 app.use("/api/dns", domainRoute);
+app.use("/api/custom", customRoute);
 
 
 

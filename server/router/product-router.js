@@ -36,6 +36,23 @@ router.route("/addpc").post(Product.addpc);
 router.route("/updatepc/:id").patch(Product.updatepc);
 router.route("/getpc").get(Product.getpc);
 router.route("/deletepc/:id").delete(Product.deletepc);
+router.route("/addpsubc").post(Product.addpsubc);
+router.route("/addpropay").post(Product.addpaymentoption);
+router.route("/updatepropay/:id").patch(Product.updatepaymentoption);
+router.route("/getpropay").get(Product.getpropay);
+router.route("/deletepropay/:id").delete(Product.deletepropay);
+//product feature
+router.route("/addprofea").post(Product.addprofea);
+router.route("/updateprofea/:id").patch(Product.updateprofea);
+router.route("/getprofea").get(Product.getprofea);
+router.route("/getprofeabyid/:id").get(Product.getprofeabyid);
+router.route("/deleteprofea/:id").delete(Product.deleteprofea);
+
+//product addons
+router.route("/addaddons").post(Product.addproaddon);
+router.route("/updateaddons/:id").patch(Product.updateaddon);
+router.route("/getaddons").get(Product.getaddon);
+router.route("/deleteaddons/:id").delete(Product.deleteaddon);
 
 router.post("/addproduct",upload.fields([ { name: 'featuredimage'},{ name: 'mainimage'}]), Product.addproduct);
 router.patch("/updateproduct/:id",upload.fields([ { name: 'featuredimage', maxCount: 1 },{ name: 'mainimage', maxCount: 1 }]), Product.updateproduct);

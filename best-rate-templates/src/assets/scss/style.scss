@@ -1,0 +1,22 @@
+// Abstract
+@import "./abstract/mixins";
+@import "./abstract/variables";
+
+// Base
+@import "./base/reset";
+@import "./base/utilities";
+// Components
+@import "./components/gallery";
+@import "./components/contact";
+
+// Layouts
+@import "./layouts/navbar";
+@import "./layouts/footer";
+
+@import "./components/hero";
+
+@import "./components/usp";
+
+@import "./components/about";
+@import "./components/product";
+@import "./components/testimonial";

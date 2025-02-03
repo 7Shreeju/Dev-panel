@@ -13,17 +13,23 @@ import Modal from "react-bootstrap/Modal";
 const AddModule = () => {
   const { id } = useParams();
   const isEdit = !!id;
+  const [pagetable, setPagename] = useState('');
 
- 
+  const handleSelect1Change = (event) => {
+    setPagename(event.target.value);
+  };
 
   const [fields, setRows] = useState([
     { name: "status", validation: "Auto Save",inputtype:"",ids:""},
     { name: "createdBy", validation: "Auto Save",inputtype:"",ids:""},
     { name: "createdDate", validation: "Auto Save",inputtype:"",ids:""},
     { name: "", validation: "",inputtype:"",ids:""},
+
+
   ]);
   const [searchTerm, setSearchTerm] = useState(""); // State to hold the search term
   const [searchClass, setSearchClass] = useState([""]); // State for dynamic search class
+  const [pageOptions, setPageOptions] = useState([]);
 
   // Function to handle adding a new row
   const handleAddRow = () => {
@@ -97,7 +103,8 @@ const AddModule = () => {
   ];
   const fieldTypesOptions = [
     { value: "Text", label: "Text" },
-    { value: "Dropdown", label: "Dropdown" },
+    { value: "Single Select", label: "Single Select" },
+    { value: "Multi Select", label: "Multi Select" },
     { value: "Textarea", label: "Textarea" },
     { value: "file", label: "file" },
     { value: "Radio", label: "Radio" },
@@ -133,7 +140,7 @@ const AddModule = () => {
 
       // Check for empty fields in the rows
       fields.forEach((field, index) => {
-        if (index >= 3 && (!field.name || !field.validation || !field.inputtype)) {
+        if (index >= 3 && (!field.name || !field.validation || !field.inputtype )) {
           newErrors.rowErrors = newErrors.rowErrors || [];
           newErrors.rowErrors.push(`Row ${index + 1} is incomplete`);
         }
@@ -204,6 +211,7 @@ const AddModule = () => {
   };
 
   const [options, setIconOptions] = useState([]);
+  const [options1, setIconOptions1] = useState([]);
 
   const [iconid, setIconid] = useState("");
 
@@ -222,6 +230,7 @@ const AddModule = () => {
         name: field.fields_name,   
         validation: field.fields_validation,  
         inputtype: field.fields_type || "",
+        dropdown: field.dropdown,
         ids:field._id||"",
       })));
 
@@ -229,6 +238,31 @@ const AddModule = () => {
       console.error("Error adding module:", error);
     }
   };
+  const fetchPageOptions = async () => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/form/getPageOptions`,{
+        method:"GET",
+      });
+      // Map data to react-select format
+     
+
+
+      const res_data = await response.json();
+
+      // Ensure res_data.msg is an array before mapping
+      const options = Array.isArray(res_data.msg) 
+        ? res_data.msg.map((page) => ({
+            value: page.table_name,
+            label: page.page_name || page.page_name, // Adjust according to API response
+          }))
+        : [];
+      setPageOptions(options);
+    } catch (error) {
+      console.error("Error fetching page options:", error);
+    }
+  };
+
+  
 
   const fetchData = async () => {
     try {
@@ -280,11 +314,16 @@ const AddModule = () => {
   useEffect(() => {
     if (iconid) {
       fetchData();
+      fetchPageOptions();
+
     }
     fetchData();
+    fetchPageOptions();
   }, [iconid]);
 
+  const [selectedRowIndex, setSelectedRowIndex] = useState(null);
 
+ 
 
   // Columns for DataTable
   const columns = [
@@ -292,7 +331,9 @@ const AddModule = () => {
       name: "Name",
       cell: (row, index) => (
         index >= 3 ? (
-        <div>
+          <div
+          
+        >
           <input
             type="text"
             name="name"
@@ -349,10 +390,40 @@ const AddModule = () => {
             control: (base) => ({ ...base, minHeight: "40px",borderColor: errors.rowErrors?.includes(`Row ${index + 2} is incomplete`) ? "red" : base.borderColor, }),
           }}
         />
+
+
         {!row.inputtype && errors.rowErrors?.includes(`Row ${index + 1} is incomplete`) && (
           <small className="text-danger">Field Type is required</small>
         )}
         </div>
+      ) : null
+      ),
+    },
+    {
+      name: "",
+      cell: (row, index) => (
+        index >= 3 ? (
+        <div>
+   {(row.inputtype === "Single Select" || row.inputtype === "Multi Select") && (
+  <Select
+    options={pageOptions}
+    name="dropdown"
+    value={pageOptions.find((option) => option.value === row.dropdown)}
+    onChange={(selectedOption) => handleChange(index, selectedOption, "dropdown")}
+    menuPortalTarget={document.body}
+    menuPosition="fixed"
+    styles={{
+      menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+      control: (base) => ({
+        ...base,
+        minHeight: "40px",
+        borderColor: errors.rowErrors?.includes(`Row ${index + 2} is incomplete`) ? "red" : base.borderColor,
+      }),
+    }}
+  />
+)}
+
+</div>
       ) : null
       ),
     },
